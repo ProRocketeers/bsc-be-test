@@ -4,6 +4,10 @@ This program keeps records of payments. The program outputs a list of all the cu
 to the console once per minute and allow the user to add more records of transactions in runtime 
 by inputting them to console. It also allows the user to optionally specify path to a file including 
 transactions to be loaded to the program at start up.  
+
+## Assumptions we take in the program 
+- You can input only (all) decimal numbers it means eg.: 123.345 is allowed
+- You output only rounded amounts (we are using roundingUp on half eg.: 0.5 => 1)
  
 Sample input:
 ```

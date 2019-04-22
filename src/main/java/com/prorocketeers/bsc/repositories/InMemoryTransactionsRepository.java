@@ -25,6 +25,7 @@ public class InMemoryTransactionsRepository implements TransactionsRepository {
     @Override public Collection<Transaction> getStatus() {
         return data
             .stream()
+            .filter(transaction -> transaction.amount.intValue()!=0) // Do not process 0 amount transactions
             .collect(groupingBy(Transaction::getCurrencyCode))
             .values()
             .stream()

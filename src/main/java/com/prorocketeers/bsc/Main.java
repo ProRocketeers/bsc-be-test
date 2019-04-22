@@ -41,7 +41,7 @@ public class Main {
         // Input handling
         val scannerTimer = new Timer();
         val scannerPeriod = 1000;
-        System.out.println("Input you transaction");
+        System.out.println("Input you transaction:");
         scannerTimer.schedule(new TimerTask() {
             public void run() {
                 val scanner = new Scanner(System.in);
@@ -61,33 +61,43 @@ public class Main {
                 } catch (TransactionParseException ex) {
                     System.out.println("Transaction failed!");
                     System.out.println(ex.getMessage());
+                    System.out.println("Do you wnat to quit? (If so write \"quit\")");
+                    val quitline = scanner.nextLine();
+                    if (quitline.equals("quit")) {
+                        System.out.println("=========== User terminated program ===========");
+                        System.exit(0);
+                    }
+                    else {
+                        System.out.println("Not quiting then!");
+                        System.out.println("Input you transaction:A");
+                    }
                 }
             }
         }, 0, scannerPeriod);
 
         // Output handling regular transaction report
         val outputTimer = new Timer();
-        val outputPeriod = 60000; //One minute in ms
+        val outputPeriod = 10000; //One minute in ms
         outputTimer.schedule(new TimerTask() {
             public void run() {
-                final var output = transactionsRepository
-                        .getStatus()
-                        .stream()
-                        .map(transaction -> {
-                            val exchangeCode = "USD";
-                            val rate = exchangeRateRepository.get(transaction.currencyCode, exchangeCode);
-                            return transaction.toOutput(rate.orElse(null), exchangeCode);
-                        })
-                        .collect(Collectors.joining(System.lineSeparator()));
-                if(output.length()>0){
-                    System.out.println("\n==========================");
-                    System.out.println("Regular transaction report");
-                    System.out.println("==========================");
-                    System.out.println(output);
-                    System.out.println("========== END ===========\n");
-                }
+            final var output = transactionsRepository
+                    .getStatus()
+                    .stream()
+                    .filter(transaction -> transaction.amount.intValue()!=0) //  0 transactions not display
+                    .map(transaction -> {
+                        val exchangeCode = "USD";
+                        val rate = exchangeRateRepository.get(transaction.currencyCode, exchangeCode);
+                        return transaction.toOutput(rate.orElse(null), exchangeCode);
+                    })
+                    .collect(Collectors.joining(System.lineSeparator()));
+            if(output.length()>0){
+                System.out.println("\n==========================");
+                System.out.println("Regular transaction report");
+                System.out.println("==========================");
+                System.out.println(output);
+                System.out.println("========== END ===========\n");
+            }
             }
         }, 0, outputPeriod);
-
     }
 }
