@@ -7,10 +7,11 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TransactionsRepositoryTest {
-    
+
     private TransactionsRepository transactionsRepository;
 
     @BeforeEach
@@ -28,5 +29,19 @@ class TransactionsRepositoryTest {
         transactionsRepository.save(b);
 
         assertTrue(transactionsRepository.getStatus().contains(expected));
+    }
+
+    @Test
+    void transactionsGetStoredOmitingZeroAmounts() {
+        val a = new Transaction("CZK", new BigDecimal("0"));
+        val b = new Transaction("ABC", new BigDecimal("00"));
+        val notExpected = new Transaction("CZK", new BigDecimal("0"));
+        val notExpectedToo = new Transaction("CZK", new BigDecimal("00"));
+
+        transactionsRepository.save(a);
+        transactionsRepository.save(b);
+
+        assertFalse(transactionsRepository.getStatus().contains(notExpected));
+        assertFalse(transactionsRepository.getStatus().contains(notExpectedToo));
     }
 }
